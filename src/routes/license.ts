@@ -1,32 +1,21 @@
 import express from "express";
-import { fetchLicenseDetailsPage } from "../fetcher.js"; // your existing fetcher that calls SCORM API
+import { createPool } from "../db.js";
 
 const router = express.Router();
 
 router.post("/license-details", async (req, res) => {
   try {
     const { date_from, date_to, page } = req.body || {};
+    const pageNum = page ?? 1;
+    const pageSize = 100;
 
-    // Read secret token/password from server env (never from client)
-    const token = process.env.SCORM_TOKEN!;
-    const password = process.env.SCORM_PASSWORD!;
-    const id = process.env.SCORM_ID!;
+    const pool = createPool();
+    const [rows] = await pool.query(
+      `SELECT * FROM API_REPORT_LICENSE_DETAILS WHERE license_start >= ? AND license_end <= ? LIMIT ? OFFSET ?`,
+      [date_from, date_to, pageSize, (pageNum - 1) * pageSize]
+    );
+    await pool.end();
 
-    if (!token || !password || !id) {
-      return res.status(500).json({ error: "server misconfigured" });
-    }
-
-    // Call the fetcher that wraps the SCORM API and returns array of rows
-    const rows = await fetchLicenseDetailsPage({
-      token,
-      password,
-      id,
-      date_from,
-      date_to,
-      page: page ?? 1,
-    });
-
-    // Return the array only (client-side types expect LicenseRow[])
     res.json({ ok: true, license: rows });
   } catch (err: any) {
     console.error("license proxy error", err);

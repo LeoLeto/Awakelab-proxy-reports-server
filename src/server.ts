@@ -7,7 +7,7 @@ import cors from "cors";
 const app = express();
 app.use(
   cors({
-    origin: ["http://13.37.231.30:5173", "http://localhost:5173"],
+    origin: ["https://proxy-reports.awakelab.world", "http://localhost:5173"],
     credentials: true,
   })
 );

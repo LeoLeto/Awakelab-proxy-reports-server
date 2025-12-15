@@ -7,7 +7,7 @@ import { CFG } from "./config.js";
 export function createPool() {
   return mysql.createPool({
     host: CFG.AURORA_HOST,
-    port: CFG.PORT,
+    port: CFG.DB_PORT,
     user: CFG.DBUSER,
     password: CFG.DBPASSWORD,
     database: CFG.DBNAME,

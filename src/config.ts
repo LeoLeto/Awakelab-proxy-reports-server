@@ -5,7 +5,7 @@ export const CFG = {
   SCORM_PASSWORD: process.env.SCORM_PASSWORD!,
   SCORM_ID: process.env.SCORM_ID!,
   AURORA_HOST: process.env.AURORA_HOST ?? "127.0.0.1",
-  PORT: Number(process.env.PORT ?? 3307),
+  DB_PORT: Number(process.env.DB_PORT ?? 3306),
   DBUSER: process.env.DBUSER!,
   DBPASSWORD: process.env.DBPASSWORD!,
   DBNAME: process.env.DBNAME ?? "scorm_proxy_mirror",

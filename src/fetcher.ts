@@ -77,3 +77,45 @@ export async function fetchAllLicenseDetails(opts: {
   }
   return all;
 }
+
+export type ClientData = {
+  id: string;
+  ref: string;
+  name: string;
+  description: any;
+  generic_connectors: string;
+  source: string;
+  alt_source: any;
+  alt_source2: any;
+  zone: string;
+  min_licences: string;
+  allow_resubscription: string;
+  active: string;
+};
+
+export async function fetchClientList(opts: {
+  token: string;
+  password: string;
+  id: string;
+}): Promise<ClientData[]> {
+  const { token, password } = opts;
+  const payload: Record<string, string> = {
+    action: "API_GET_CLIENT_LIST",
+    output: "JSON",
+    password,
+  };
+
+  const res = await axios.post(BASE_URL, formBody(payload), {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "token": token,
+    },
+    timeout: 30000,
+  });
+
+  const data = res.data;
+  const clientsContainer = data?.message?.clients;
+  const clientArray = clientsContainer?.client;
+  if (!clientArray || !Array.isArray(clientArray)) return [];
+  return clientArray as ClientData[];
+}

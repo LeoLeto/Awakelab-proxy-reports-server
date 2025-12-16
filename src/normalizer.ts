@@ -58,6 +58,9 @@ export function normalizeLicenseRow(
         ? JSON.stringify(raw.customer_source)
         : raw.customer_source
     ),
+    customer_url: clean(raw.customer_url),
+    customer_url2: clean(raw.customer_url2),
+    customer_url3: clean(raw.customer_url3),
     user_username: clean(raw.user_username ?? raw.username ?? raw.userUsername),
     user_fullname: clean(raw.user_fullname ?? raw.fullname ?? raw.userFullname),
 

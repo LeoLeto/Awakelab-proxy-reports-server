@@ -37,6 +37,18 @@ router.post("/license-details", async (req, res) => {
     await pool.end();
 
     console.log("Query successful, rows:", Array.isArray(rows) ? rows.length : 0);
+    
+    // Log first record to check URL fields
+    if (Array.isArray(rows) && rows.length > 0) {
+      const firstRow = rows[0] as any;
+      console.log("Sample record:", {
+        customer_name: firstRow.customer_name,
+        customer_url: firstRow.customer_url,
+        customer_url2: firstRow.customer_url2,
+        customer_url3: firstRow.customer_url3,
+      });
+    }
+    
     res.json({ ok: true, license: rows });
   } catch (err: any) {
     console.error("license proxy error", err);

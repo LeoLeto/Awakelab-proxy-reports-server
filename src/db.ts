@@ -20,13 +20,16 @@ export function createPool() {
 
 const UPsertSQL = `
 INSERT INTO API_REPORT_LICENSE_DETAILS
-(customer_ref, customer_name, customer_source, user_username, user_fullname, product_ref, product_title, product_duration, product_price,
+(customer_ref, customer_name, customer_source, customer_url, customer_url2, customer_url3, user_username, user_fullname, product_ref, product_title, product_duration, product_price,
  license_details, license_start, license_end, tracking_first_access, tracking_last_access, tracking_visits, tracking_elapsed_time,
  natural_key_hash, is_provisional, _fetch_date_from, _fetch_date_to, _source_page)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 ON DUPLICATE KEY UPDATE
   customer_name=VALUES(customer_name),
   customer_source=VALUES(customer_source),
+  customer_url=VALUES(customer_url),
+  customer_url2=VALUES(customer_url2),
+  customer_url3=VALUES(customer_url3),
   user_fullname=VALUES(user_fullname),
   product_title=COALESCE(NULLIF(VALUES(product_title), ''), product_title),
   product_duration=COALESCE(VALUES(product_duration), product_duration),
@@ -61,6 +64,9 @@ export async function upsertLicense(
       row.customer_ref,
       row.customer_name,
       row.customer_source,
+      row.customer_url,
+      row.customer_url2,
+      row.customer_url3,
       row.user_username,
       row.user_fullname,
       row.product_ref,

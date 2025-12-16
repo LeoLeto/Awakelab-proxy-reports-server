@@ -8,8 +8,9 @@ import {
   setLastFetchDate,
   upsertLicense,
 } from "./db.js";
-import { fetchAllLicenseDetails } from "./fetcher.js";
+import { fetchAllLicenseDetails, fetchClientList } from "./fetcher.js";
 import { normalizeLicenseRow } from "./normalizer.js";
+import { enrichLicenseRowsWithUrls } from "./enricher.js";
 
 export async function ingestLicenses() {
   const pool = createPool();
@@ -18,15 +19,26 @@ export async function ingestLicenses() {
   const fromDate = last ?? CFG.FULL_START_DATE;
   const toDate = today;
 
-  const rawRows = await fetchAllLicenseDetails({
-    fromDate,
-    toDate,
-    token: CFG.SCORM_TOKEN,
-    password: CFG.SCORM_PASSWORD,
-    id: CFG.SCORM_ID,
-  });
+  // Fetch both license details and client list
+  const [rawRows, clients] = await Promise.all([
+    fetchAllLicenseDetails({
+      fromDate,
+      toDate,
+      token: CFG.SCORM_TOKEN,
+      password: CFG.SCORM_PASSWORD,
+      id: CFG.SCORM_ID,
+    }),
+    fetchClientList({
+      token: CFG.SCORM_TOKEN,
+      password: CFG.SCORM_PASSWORD,
+      id: CFG.SCORM_ID,
+    }),
+  ]);
 
-  if (!rawRows.length) {
+  // Enrich license rows with URL data from client list
+  const enrichedRows = enrichLicenseRowsWithUrls(rawRows, clients);
+
+  if (!enrichedRows.length) {
     await setLastFetchDate(pool, toDate);
     await pool.end();
     return { fetched: 0, upserted: 0, fromDate, toDate };
@@ -37,7 +49,7 @@ export async function ingestLicenses() {
 
   // iterate sequentially or concurrently per-row (concurrency controlled)
   await Promise.all(
-    rawRows.map((raw, idx) =>
+    enrichedRows.map((raw, idx) =>
       limit(async () => {
         const normalized = normalizeLicenseRow(
           raw,
@@ -76,5 +88,5 @@ export async function ingestLicenses() {
 
   await setLastFetchDate(pool, toDate);
   await pool.end();
-  return { fetched: rawRows.length, upserted, fromDate, toDate };
+  return { fetched: enrichedRows.length, upserted, fromDate, toDate };
 }

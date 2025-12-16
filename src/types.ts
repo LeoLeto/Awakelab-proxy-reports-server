@@ -4,6 +4,9 @@ export type NormalizedLicenseRow = {
   customer_ref: string | null;
   customer_name: string | null;
   customer_source: string | null;
+  customer_url: string | null;
+  customer_url2: string | null;
+  customer_url3: string | null;
   user_username: string | null;
   user_fullname: string | null;
   product_ref: string | null;

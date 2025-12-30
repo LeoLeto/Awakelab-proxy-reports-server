@@ -43,7 +43,7 @@ export function validateCredentials(
 
 export function generateToken(username: string): string {
   const payload: JWTPayload = { username };
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
 }
 
 export function verifyToken(token: string): JWTPayload | null {
